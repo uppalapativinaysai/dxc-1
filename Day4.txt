@@ -1,0 +1,707 @@
+CREATE TABLE a AS select * from employees;
+
+
+--SELF JOIN
+JOINING THE SAME TABLE
+
+select * from employees;
+
+
+Employee: Neena managed by Manager: Steven
+
+select 'Employee: ' || worker.first_name || ' managed by Manager: ' || manager.first_name
+AS "Employee and there Managers"
+FROM employees worker JOIN employees manager
+ON manager.manager_id = worker.employee_id
+
+inner join vs self join
+diff table     same table
+matching data   matching data
+
+
+---SUBQUERY - A QUERY WITHIN A QUERY
+
+EXAMPLE 1 :
+QUERY : I WANT TO KNOW ALL THE PEOPLE WHO ARE HUMAN RESOURCES employees
+
+select * from departments;
+
+---SUBQUERY
+select first_name from employees where department_id IN 
+(select department_id from departments where UPPER(department_name) = 'HUMAN RESOURCES' )
+
+EXAMPLE 2: I WANT TO KNOW ALL THE PEOPLE WHOSE SALARY THAN Neena
+
+
+select first_name,salary from employees where salary > ALL (select salary from employees where lower(first_name)='neena')
+
+
+
+SELECT department_id, MAX(salary)
+FROM employees
+GROUP BY department_id
+
+REQUIREMENT ---
+* I want the list of employees max salary in each department but it has be greater than max(salary) > 11000
+
+--ERROR
+SELECT department_id, MAX(salary)
+FROM employees
+where max(salary) > 11000
+GROUP BY department_id
+
+--SOLUTION
+SELECT department_id, MAX(salary)
+FROM employees
+GROUP BY department_id
+HAVING max(salary) > 11000
+
+
+
+
+
+
+
+
+
+
+==========
+
+---SUBQUERY - A QUERY WITHIN A QUERY
+
+EXAMPLE 1 :
+QUERY : I WANT TO KNOW ALL THE PEOPLE WHO ARE HUMAN RESOURCES employees
+
+select * from departments;
+
+---SUBQUERY
+select first_name from employees where department_id IN 
+(select department_id from departments where UPPER(department_name) = 'HUMAN RESOURCES' )
+
+EXAMPLE 2: I WANT TO KNOW ALL THE PEOPLE WHOSE SALARY THAN Steven
+
+
+select first_name,salary from employees where salary > ANY (select salary from employees where lower(first_name)='neena')
+
+
+--MAXIMUM -- all
+SELECT employee_id, last_name, job_id, salary
+FROM employees
+WHERE salary > ALL
+(SELECT salary
+FROM employees
+WHERE job_id = 'IT_PROG')
+
+
+--MINIMUM - any
+SELECT employee_id, last_name, job_id, salary
+FROM employees
+WHERE salary > ANY
+(SELECT salary
+FROM employees
+WHERE job_id = 'IT_PROG')
+
+
+
+select first_name,salary from employees where salary < (select salary from employees where lower(first_name)='neena')
+
+
+
+
+select first_name,salary from employees where salary < (select salary from employees where lower(first_name)='steven')
+
+--SUBQUERY 
+
+
+SELECT employee_id, last_name, job_id, salary
+FROM employees
+WHERE salary < ALL
+(SELECT salary
+FROM employees
+WHERE job_id = 'IT_PROG')
+AND job_id <> 'IT_PROG';
+
+
+select first_name,salary from employees where salary > ALL (select salary from employees where upper(first_name) ='steven')
+
+
+
+
+
+* where clause of outer query must match select clause (columns)
+
+--MULTIPLE COLUMN SUBQUERY
+
+SELECT first_name, department_id, salary
+FROM employees
+WHERE (salary, department_id) IN
+(SELECT min(salary), department_id
+FROM employees
+GROUP BY department_id)
+ORDER BY department_id;
+
+
+SELECT department_id, MAX(salary)
+FROM employees
+GROUP BY department_id
+
+REQUIREMENT ---
+* I want the list of employees max salary in each department but it has be greater than max(salary) > 11000
+
+--ERROR
+SELECT department_id, MAX(salary)
+FROM employees
+where max(salary) > 11000
+GROUP BY department_id
+
+--SOLUTION
+SELECT department_id, MAX(salary)
+FROM employees
+GROUP BY department_id
+HAVING max(salary) > 11000
+
+
+-----------SET OPERATORS
+-----------DML ( insert, delete, update, commit, rollback, savepoint )
+
+
+
+CREATE TABLE RETIRED_EMPLOYEES
+AS
+select * from EMPLOYEES WHERE first_name IN ( 'Neena' , 'Diana' )
+
+
+
+CREATE TABLE SENIOR_EMPLOYEES
+as
+select * from employees where salary > 16000
+
+CREATE TABLE copy_employees
+As 
+Select * from employees
+
+
+---- 
+DELETE FROM COPY_EMPLOYEES where first_name IN ( 'Diana','Neena');
+select * from COPY_EMPLOYEES;
+select * from RETIRED_EMPLOYEES;
+select * from SENIOR_EMPLOYEES;
+
+
+----The UNION operator returns rows from both queries after eliminating duplications.
+select * from COPY_EMPLOYEES
+UNION
+select * from SENIOR_EMPLOYEES;
+
+
+--------
+
+INTERSECT- The INTERSECT operator returns rows that are common to both queries.
+
+select * from COPY_EMPLOYEES
+INTERSECT
+select * from SENIOR_EMPLOYEES;
+
+
+select * from COPY_EMPLOYEES
+INTERSECT
+select * from RETIRED_EMPLOYEES;
+
+
+---The MINUS operator returns all the distinct rows selected by the first query, but not present in the second query result set.
+
+
+
+
+select * from COPY_EMPLOYEES
+MINUS
+select * from SENIOR_EMPLOYEES;
+//103
+
+
+select * from COPY_EMPLOYEES
+MINUS
+select * from RETIRED_EMPLOYEES;
+
+-----------------------------------------------------COPY
+
+1) ** RULE - SELECT in both must MATCH
+select * from departments;
+select * from locations;
+
+SELECT location_id, department_name AS "Department", TO_CHAR(NULL) AS "Warehouse location"
+FROM departments
+UNION
+SELECT location_id, TO_CHAR(NULL)AS "Department", state_province AS "Warehouse location"
+FROM locations;
+
+-----------SET OPERATORS
+-----------DML ( insert, delete, update, commit, rollback, savepoint )
+
+
+
+CREATE TABLE RETIRED_EMPLOYEES
+AS
+select * from EMPLOYEES WHERE first_name IN ( 'Neena' , 'Diana' )
+
+DROP TABLE SENIOR_EMPLOYEES
+
+CREATE TABLE SENIOR_EMPLOYEES
+as
+select * from employees where salary > 16000
+
+CREATE TABLE copy_employees
+As 
+Select * from employees
+
+
+---- 
+DELETE FROM COPY_EMPLOYEES where first_name IN ( 'Diana','Neena');
+select count(*) from COPY_EMPLOYEES;    -- 105
+select * from RETIRED_EMPLOYEES; -- 2
+select * from SENIOR_EMPLOYEES;  -- 3
+
+
+
+----The UNION operator returns rows from both queries after eliminating duplications.
+select * from COPY_EMPLOYEES              
+UNION
+select * from SENIOR_EMPLOYEES;
+
+
+select * from COPY_EMPLOYEES
+UNION
+select * from RETIRED_EMPLOYEES;
+
+
+--------
+
+Question : so union is like adding non duplicate values and deleting the duplicate values ? it is about SELECTING
+
+---UNION ALL - The UNION ALL operator returns rows from both queries, including all duplications.
+
+select * from COPY_EMPLOYEES
+UNION
+select * from SENIOR_EMPLOYEES;
+//105
+
+
+select * from COPY_EMPLOYEES
+UNION
+select * from SENIOR_EMPLOYEES;
+//105
+
+select * from COPY_EMPLOYEES
+UNION ALL
+select * from SENIOR_EMPLOYEES;
+//108
+
+
+select first_name,department_id from COPY_EMPLOYEES
+UNION ALL
+select first_name,department_id from SENIOR_EMPLOYEES;
+
+
+select * from retired_employees
+UNION ALL
+select * from employees
+
+
+--RULES FOR USING SET OPERATORS
+
+1) The expressions in the SELECT lists must match in number.
+
+(select first_name,department_id from retired_employees)
+UNION ALL
+select first_name,department_id from employees
+
+
+
+2) The data type of each column in the subsequent query must match the data type of its corresponding column in the first query.
+
+3) Parentheses can be used to alter the sequence of execution
+
+ select * from copy_employees 
+UNION ALL
+ select * from senior_employees  
+
+4) ORDER BY clause can appear only at the very end of the statement.
+
+
+ select first_name,department_id,salary from copy_employees
+UNION ALL
+ select first_name,department_id,salary  from senior_employees ORDER BY first_name
+
+a)
+ select first_name,department_id,salary from copy_employees 
+UNION ALL
+ select first_name,department_id,salary  from senior_employees ORDER BY first_name
+
+
+
+
+
+
+
+
+
+
+
+
+
+-ERROR - BECAUSE BOTH THE TABLES DOESNT HAVE SAME COLUMNS
+SELECT * from COPY_EMPLOYEES
+UNION
+SELECT * from RETIRED_EMPLOYEES
+
+
+
+-ERROR - BECAUSE RETIRED_EMPLOYEES doesn't have hire_date
+
+SELECT first_name,salary, hire_date as "Hired Date" from COPY_EMPLOYEES
+UNION
+SELECT first_name,salary  from RETIRED_EMPLOYEES
+
+
+SELECT first_name,salary, hire_date as "Hired Date" from COPY_EMPLOYEES
+UNION
+SELECT first_name,salary , TO_DATE(NULL) as "Hired Date" from RETIRED_EMPLOYEES
+
+
+SELECT first_name,salary,TO_DATE( hire_date) as "Hired Date" from COPY_EMPLOYEES
+UNION
+SELECT first_name,salary , TO_DATE(NULL) "Hired Date" from RETIRED_EMPLOYEES
+
+
+
+INTERSECT- The INTERSECT operator returns rows that are common to both queries.
+
+select * from COPY_EMPLOYEES
+INTERSECT
+select * from SENIOR_EMPLOYEES;
+
+
+select * from COPY_EMPLOYEES
+INTERSECT
+select * from RETIRED_EMPLOYEES;
+
+
+---The MINUS operator returns all the distinct rows selected by the first query, but not present in the second query result set.
+
+select * from COPY_EMPLOYEES
+MINUS
+select * from SENIOR_EMPLOYEES;
+//103
+
+select * from COPY_EMPLOYEES
+MINUS
+select * from RETIRED_EMPLOYEES;
+
+
+
+
+-----------------------------------------------------COPY
+
+1) ** RULE - SELECT in both must MATCH
+select * from departments;
+select * from locations;
+
+SELECT location_id, department_name AS "Department", TO_CHAR(NULL) AS "Warehouse location"
+FROM departments
+UNION
+SELECT location_id, TO_CHAR(NULL)AS "Department", state_province AS "Warehouse location"
+FROM locations;
+
+
+
+
+
+
+
+
+
+
+-ERROR - BECAUSE BOTH THE TABLES DOESNT HAVE SAME COLUMNS
+SELECT * from COPY_EMPLOYEES
+UNION
+SELECT * from RETIRED_EMPLOYEES
+
+
+
+-ERROR - BECAUSE RETIRED_EMPLOYEES doesn't have hire_date
+
+SELECT first_name,salary, hire_date as "Hired Date" from COPY_EMPLOYEES
+UNION
+SELECT first_name,salary  from RETIRED_EMPLOYEES
+
+
+SELECT first_name,salary, hire_date as "Hired Date" from COPY_EMPLOYEES
+UNION
+SELECT first_name,salary , TO_DATE(NULL) as "Hired Date" from RETIRED_EMPLOYEES
+
+
+SELECT first_name,salary,TO_DATE( hire_date) as "Hired Date" from COPY_EMPLOYEES
+UNION
+SELECT first_name,salary , TO_DATE(NULL) "Hired Date" from RETIRED_EMPLOYEES
+
+------------------------------
+
+order by - rules
+
+1)
+SELECT location_id, department_name AS "Department", TO_CHAR(NULL) AS "Warehouse location"
+FROM departments
+UNION ALL
+SELECT TO_NUMBER(NULL), TO_CHAR(NULL)AS "Department", state_province AS "Warehouse location"
+FROM locations order by location_id;
+
+2)
+SELECT TO_NUMBER(NULL), department_name AS "Department", TO_CHAR(NULL) AS "Warehouse location"
+FROM departments
+UNION ALL
+SELECT  location_id, TO_CHAR(NULL)AS "Department", state_province AS "Warehouse location"
+FROM locations order by location_id;
+
+
+
+
+
+UNION to return all distinct rows
+•
+UNION ALL to return all rows, including duplicates
+•
+INTERSECT to return all rows that are shared by both queries
+•
+MINUS to return all distinct rows that are selected by the first query, but not by the second
+•
+ORDER BY only at the very end of the statement
+
+
+--INSERT 
+
+Use case: I have to insert one new department.
+
+select * from departments where department_id in ( 761, 762 );
+
+desc departments;
+
+insert into DEPARTMENTS values (761,'Public Relations',200,1500)
+
+insert into DEPARTMENTS values (762,'Fire Service',200,1500)
+
+
+desc employees;
+
+select * from employees where employee_id = 1918
+
+use case : 
+
+INSERT into EMPLOYEES values (1918, 'krishna', 'kamal', 'abcde@gmail.com', '9988776655', '09-02-20', 'IT_PROG' , 25000, NULL, 103, 20);
+
+insert into employees  values(1920,'Jagan','nath','nath@gmail.com',
+'12323','01-22-2020', 'IT_PROG', 25000 , NULL, 123 , 10)  
+
+
+
+
+select * from departments where department_name = 'HR';
+
+USE CASE: we have the only department_id = 7161 and department_name = 'HR
+
+1) EXPLICIT 
+INSERT INTO departments values(7161,'HR', NULL, NULL);
+
+2) IMPLICIT
+INSERT INTO departments(department_id,department_name) values(7162,'HR');
+
+
+
+insert into employees  values(1921,'Ikben','Ghosh','Ikben@gmail.com','1239871',SYSDATE, 'IT_PROG', 25000 , NULL, 123 , 10)  
+
+insert into employees  values(1922,'Ganesh','Reddy','ganesh@gmail.com','9991231',CURRENT_DATE, 'IT_PROG', 25000 , NULL, 123 , 10)  
+
+
+select * from employees where employee_id = 1922;
+
+--INSERT 
+
+Use case: I have to insert one new department.
+
+select * from departments where department_id in ( 761, 762 );
+
+desc departments;
+
+insert into DEPARTMENTS values (761,'Public Relations',200,1500)
+
+insert into DEPARTMENTS values (762,'Fire Service',200,1500)
+
+
+desc employees;
+
+select * from employees where employee_id = 1918
+
+use case : 
+
+
+insert into employees  values(1920,'Jagan','nath','nath@gmail.com',
+'12323','01-22-2020', 'IT_PROG', 25000 , NULL, 123 , 10)  
+
+
+
+
+select * from departments where department_name = 'HR';
+
+USE CASE: we have the only department_id = 7161 and department_name = 'HR
+
+1) EXPLICIT 
+INSERT INTO departments values(7161,'HR', NULL, NULL);
+
+2) IMPLICIT
+INSERT INTO departments(department_id,department_name) values(7162,'HR');
+
+----INSERTING DATA VALUES
+
+1)
+INSERT into EMPLOYEES values (1918, 'krishna', 'kamal', 'abcde@gmail.com', '9988776655', '09-02-20', 'IT_PROG' , 25000, NULL, 103, 20);
+
+2) SYSDATE
+insert into employees  values(1921,'Ikben','Ghosh','Ikben@gmail.com','1239871',SYSDATE, 'IT_PROG', 25000 , NULL, 123 , 10)  
+
+3) CURRENT_DATE
+insert into employees  values(1922,'Ganesh','Reddy','ganesh@gmail.com','9991231',CURRENT_DATE, 'IT_PROG', 25000 , NULL, 123 , 10)  
+
+4)
+INSERT INTO employees
+VALUES (1924,
+'Den', 'Raphealy',
+'DRAPHEA2L@gmail.com', '515.127.4561',
+TO_DATE('DECEMBER 3, 2003', 'MONTH DD, YYYY'),
+'SA_REP', 11000, 0.2, 100, 60);
+
+select * from employees where employee_id = 1924;
+
+------------------------------SUBSTITUTION VARIABLE
+
+
+INSERT INTO departments
+(department_id, department_name, location_id)
+VALUES (&department_id, '&department_name',&location);
+
+
+desc departments;
+
+
+
+---COPYING FROM ANOTHER TABLE
+
+INSERT INTO sales_reps(id, name, salary, commission_pct)
+SELECT employee_id, last_name, salary, commission_pct
+FROM employees
+WHERE job_id LIKE '%REP%';
+
+
+
+
+
+
+
+================UPDATE DATA====
+
+SELECT * from employees;
+
+UPDATE employees
+SET department_id = 50
+WHERE employee_id = 107;
+
+select * from copy_employees;
+
+UPDATE copy_employees
+SET department_id = 50
+
+---UPDATING MULTIPLE COLUMNS
+UPDATE copy_employees SET email='steven@gmail.com', phone_number='8867205331' where employee_id = 100;
+
+UPDATE copy_employees SET JOB_ID='FI_MGR' where employee_id in (103,104,105,106)
+
+
+UPDATE copy_employees SET JOB_ID='FI_ACCOUNT' where employee_id BETWEEN 103 AND 106;
+
+
+UPDATE copy_employees
+SET (job_id,salary) = (SELECT job_id,salary
+FROM employees
+WHERE employee_id = 205)
+WHERE employee_id = 103;
+
+
+select * from copy_employees where first_name = 'David';
+
+WAQ TO update all David's salary = increase 20% of the salary,
+
+UPDATE copy_employees
+SET salary = (salary*0.2)+salary
+WHERE first_name='David'
+
+-------UPDATE USING SUBQUERY
+UPDATE copy_employees 
+SET department_id = (SELECT department_id FROM employees WHERE employee_id = 100)
+WHERE job_id = (SELECT job_id FROM employees WHERE employee_id = 200);
+
+-------------
+
+select * from copy_employees;
+CREATE TABLE copy_employees
+AS
+SELECT * FROM employees;
+
+
+delete from copy_employees where first_name = 'Steven';
+
+
+delete from copy_employees where employee_id = 100;
+
+---DELETE ALL THE DATA FROM THE TABLE BUT THE TABLE WILL EXIST, EMPTY TABLE WILL BE THERE.
+delete from copy_employees ;
+
+---
+WAQ to delete all the employees who have been today.
+delete from employees where hire_date =sysdate;
+
+
+
+DELETE FROM copy_employees WHERE department_id IN (SELECT department_id FROM departments WHERE department_name LIKE '%Public%');
+
+
+delete from copy_employees;
+truncate table copy_employees;
+
+select * from copy_employees;
+
+delete      TRUNCATE
+ 
+DML         DDL
+UNDO        CAN'T EASILY UNDO
+SLOWER      FASTER
+
+
+-------ORACLE SERVER
+            -- SAME TABLE 
+
+MORE THAN ONE USER WILL WORK AT THE SAME TIME.
+
+1 PERSON - TUFAIL - XE -- HR.DEPARTMENTS
+
+select count(*) from hr.departments;
+
+select * from departments;
+
+insert into hr.departments values(620,'HRR',200,1500);
+
+
+
+
+
+
+
+
+
