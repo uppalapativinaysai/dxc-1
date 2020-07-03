@@ -1,0 +1,19 @@
+Create a table called Employee with the following Columns  and perform the following operations:-
+------------------------------------------------------------------------------------------------------------
+
+EmployeeID
+EmployeeName
+EmployeeAddress
+DOB
+DOJ
+Salary
+
+a) Create Table
+
+
+b.) Insert five records
+
+
+c) Retrieve all the records
+
+solution : select * from employee
