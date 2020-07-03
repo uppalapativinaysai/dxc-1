@@ -1,0 +1,557 @@
+SQL> select count(*) from hr.departments;
+
+  COUNT(*)
+----------
+        51
+
+SQL> insert into hr.departments values(843,'HR',100,1700);
+
+1 row created.
+
+SQL> savepoint dxc1;
+
+Savepoint created.
+
+SQL> insert into hr.departments values(844,'HR',100,1700);
+
+1 row created.
+
+SQL> savepoint dxc2;
+
+Savepoint created.
+
+SQL> insert into hr.departments values(845,'HR',100,1700);
+
+1 row created.
+
+SQL> savepoint dxc3;
+
+Savepoint created.
+
+SQL> select count(*) from hr.departments;
+
+  COUNT(*)
+----------
+        54
+
+SQL> rollback to dxc2;
+
+Rollback complete.
+
+SQL> select count(*) from hr.departments;
+
+  COUNT(*)
+----------
+        53
+
+SQL> commit;
+
+Commit complete.
+
+===============
+
+User1 :
+
+select count(*) from departments;
+
+insert into departments values(954,'HR',100,1700);
+
+commit;
+
+CREATE TABLE ABC
+(
+   student_id number(4),
+   student_name varchar2(20)
+)
+
+desc ABC;
+
+
+
+
+
+
+commit;
+
+select count(*) from departments;
+
+insert into departments values(962,'HR',100,1700);
+
+
+insert into departments values(963,'HR',100,1700);
+
+
+commit;
+
+
+
+
+
+
+
+select * from copy_employees;
+
+
+
+delete from copy_employees;
+
+rollback;
+
+
+
+
+
+
+UPDATE employees SET salary = 18000
+WHERE last_name = 'Grant';
+
+commit;
+
+select * from employees WHERE last_name = 'Grant';
+
+
+USER-1 :
+SELECT employee_id, salary, commission_pct, job_id 
+FROM employees WHERE job_id = 'SA_REP' 
+FOR UPDATE 
+ORDER BY employee_id;
+
+-----LOCK WOULD BE AUTOMATIC WHEN YOU ISSUE ANY DML -- IMPLICIT
+
+----EXPLICIT LOCKING
+SELECT employee_id, salary, commission_pct, job_id 
+FROM employees salary > 10000 
+FOR UPDATE 
+ORDER BY employee_id;
+
+
+commit;
+
+
+
+======Locks employees and departments
+
+SELECT e.employee_id, e.salary, e.commission_pct
+FROM employees e JOIN departments d
+USING (department_id)
+WHERE job_id = 'ST_CLERK'
+AND location_id = 1500
+FOR UPDATE
+ORDER BY e.employee_id;
+
+
+
+-------------CREATE TABLE
+
+
+User1 :
+
+select count(*) from departments;
+
+insert into departments values(954,'HR',100,1700);
+
+commit;
+
+CREATE TABLE ABC
+(
+   student_id number(4),
+   student_name varchar2(20)
+)
+
+desc ABC;
+
+
+
+
+
+
+commit;
+
+select count(*) from departments;
+
+insert into departments values(962,'HR',100,1700);
+
+
+insert into departments values(963,'HR',100,1700);
+
+
+commit;
+
+
+
+
+
+
+
+select * from copy_employees;
+
+
+
+delete from copy_employees;
+
+rollback;
+
+
+
+
+
+
+UPDATE employees SET salary = 18000
+WHERE last_name = 'Grant';
+
+commit;
+
+select * from employees WHERE last_name = 'Grant';
+
+
+USER-1 :
+SELECT employee_id, salary, commission_pct, job_id 
+FROM employees WHERE job_id = 'SA_REP' 
+FOR UPDATE 
+ORDER BY employee_id;
+
+-----LOCK WOULD BE AUTOMATIC WHEN YOU ISSUE ANY DML -- IMPLICIT
+
+----EXPLICIT LOCKING
+SELECT employee_id, salary, commission_pct, job_id 
+FROM employees salary > 10000 
+FOR UPDATE 
+ORDER BY employee_id;
+
+
+commit;
+
+
+
+
+
+
+
+
+
+SELECT e.employee_id, e.salary, e.commission_pct
+FROM employees e JOIN departments d
+USING (department_id)
+WHERE e.job_id = 'ST_CLERK'
+AND d.location_id = 1500
+FOR UPDATE
+ORDER BY e.employee_id;
+
+
+commit;
+
+select * from departments where department_id = 620;
+
+
+
+
+
+desc dept;
+
+CREATE TABLE dept
+(
+   deptno number(3),
+   deptname varchar2(20),
+   location varchar2(40),
+   create_date date DEFAULT SYSDATE
+)
+
+desc dept;
+
+INSERT INTO dept values ( 1, 'HR', 'BANGALORE', default)
+
+
+INSERT INTO dept values ( 2, 'Finance', 'HYDERABAD', '09-03-2018');
+
+select * from dept;
+
+
+============
+
+
+
+
+DROP TABLE DEPT;
+
+CREATE TABLE dept
+(
+   deptno number(3) NOT NULL,
+   deptname varchar2(10) NOT NULL,
+   location varchar2(10) default 'BANGALORE' ,
+   create_date date DEFAULT SYSDATE
+)
+
+desc dept;
+
+INSERT INTO dept values ( 1, 'HR', 'BANGALORE', default)
+INSERT INTO dept values ( 2, 'Finance', default, NULL );
+
+XX - INSERT INTO dept values ( 3, NULL, default, NULL );
+XX - INSERT INTO dept values ( default, default, default, default)
+
+INSERT INTO dept (deptno,deptname,location,create_date) values ( 8, 'HR' , default, default);
+
+select * from employees;
+
+desc employees;
+
+select * from dept;
+
+INSERT into employees(employee_id,last_name,email,hire_date,job_id) values (80,'raashu','raashu@gmail.com',sysdate,'IT_PROG')
+
+
+
+desc employee;
+
+
+
+DROP TABLE EMPLOYEE;
+
+create table employee
+(  
+      EmployeeID number CONSTRAINT PKEMPID primary key,
+      EmployeeName varchar2(10) CONSTRAINT PKEMPNAMENOTNULL not null,
+      EmployeeAddress varchar2(20) CONSTRAINT CHKEMPADD check ( EmployeeAddress in ('Mumbai','Kolkata','Hyderabad','Bangalore')),
+      DOB date, 
+      DOJ date,
+      salary number CONSTRAINT CHKEMPSAL check ( salary between 0 and 99000)
+) 
+
+INSERT into employee values (1, 'Tufail' , 'Hyderabad', '12-05-1998', '06-19-2020', 25000); 
+
+select * from employee;
+
+drop table employee;
+---CREATING CONSTRAINTS AT COLUMN LEVEL  ( YOU CAN'T HAVE TWO PRIMARY KEYS )
+create table employee
+(  
+      EmployeeID number CONSTRAINT PKEMPID primary key,
+      EmployeeName varchar2(10) CONSTRAINT PKEMPNAME primary key,,
+      EmployeeAddress varchar2(20) CONSTRAINT CHKEMPADD check ( EmployeeAddress not in( 'Newyork', 'London' ,'Paris' ) ),
+      salary number CONSTRAINT CHKEMPSAL check ( salary between 20000 and 30000),
+      companyaddress varchar2(20) default 'ASV Suntech Park'
+) 
+---CREATING CONSTRAINTS AT TABLE LEVEL -- CREATING MULTIPLE PRIMARY KEY -- COMPOSITE KEY
+create table employee
+(  
+      EmployeeID number,
+      EmployeeName varchar2(10),
+      EmployeeAddress varchar2(20),
+      salary number,
+      companyaddress varchar2(20) default 'ASV Suntech Park',
+      CONSTRAINT pkid primary key (EmployeeID,EmployeeName),
+      CONSTRAINT CHKEMPSAL check ( salary between 20000 and 30000),
+      CONSTRAINT CHKEMPADD check ( EmployeeAddress not in( 'Newyork', 'London' ,'Paris' ) )
+) 
+
+insert into employee values(114,'Jay','Delhi',25000, default);
+
+select * from employee;
+
+-------FOREIGN KEY
+DROP TABLE EMPLOYEE;
+DROP TABLE PROJECT;
+
+create table project
+(
+    project_id number primary key,
+    project_name varchar(10) unique,
+    project_type varchar(10)
+)
+
+create table employee
+(  
+      EmployeeID number,
+      EmployeeName varchar2(10),
+      EmployeeAddress varchar2(20),
+      salary number,
+      project_id number,
+      companyaddress varchar2(20) default 'ASV Suntech Park',
+      CONSTRAINT pkid primary key (EmployeeID),
+      CONSTRAINT CHKEMPSAL check ( salary between 20000 and 30000),
+      CONSTRAINT CHKEMPADD check ( EmployeeAddress not in( 'Newyork', 'London' ,'Paris' ) ),
+      CONSTRAINT UNIEMPNAME UNIQUE (EmployeeName),
+      CONSTRAINT FKPID FOREIGN KEY (project_id) REFERENCES project(project_id)
+) 
+
+insert into project values (1009, 'Banking','Finance');
+insert into employee values(115,'Mohan','Delhi',25000, 1009, default);
+insert into employee values(116,'Yamini','Mumbai',25000, 1009, default);
+
+select * from employee;
+select * from project;
+
+
+
+
+DROP TABLE DEPT;
+
+CREATE TABLE dept10
+(
+   deptno number(3) primary key,
+   deptname varchar2(10) unique,
+   location varchar2(10) default 'BANGALORE' ,
+   create_date date DEFAULT SYSDATE
+)
+
+desc dept;
+
+INSERT INTO dept10 values ( 1, 'HR', 'BANGALORE', default)
+INSERT INTO dept10 values ( 2, null, 'BANGALORE', default)
+INSERT INTO dept10 values ( 4, NULL, 'BANGALORE', default)
+select * from dept10;
+
+INSERT INTO dept values ( 2, 'Finance', default, NULL );
+
+XX - INSERT INTO dept values ( 3, NULL, default, NULL );
+XX - INSERT INTO dept values ( default, default, default, default)
+
+INSERT INTO dept (deptno,deptname,location,create_date) values ( 8, 'HR' , default, default);
+
+select * from employees;
+
+desc employees;
+
+select * from dept;
+
+INSERT into employees(employee_id,last_name,email,hire_date,job_id) values (80,'raashu','raashu@gmail.com',sysdate,'IT_PROG')
+
+
+
+desc employee;
+
+
+
+DROP TABLE EMPLOYEE;
+
+create table employee
+(  
+      EmployeeID number CONSTRAINT PKEMPID primary key,
+      EmployeeName varchar2(10) CONSTRAINT PKEMPNAMENOTNULL not null,
+      EmployeeAddress varchar2(20) CONSTRAINT CHKEMPADD check ( EmployeeAddress in ('Mumbai','Kolkata','Hyderabad','Bangalore')),
+      DOB date, 
+      DOJ date,
+      salary number CONSTRAINT CHKEMPSAL check ( salary between 0 and 99000)
+) 
+
+INSERT into employee values (1, 'Tufail' , 'Hyderabad', '12-05-1998', '06-19-2020', 25000); 
+
+select * from employee;
+
+drop table employee;
+---CREATING CONSTRAINTS AT COLUMN LEVEL  ( YOU CAN'T HAVE TWO PRIMARY KEYS )
+create table employee
+(  
+      EmployeeID number CONSTRAINT PKEMPID primary key,
+      EmployeeName varchar2(10) CONSTRAINT PKEMPNAME primary key,,
+      EmployeeAddress varchar2(20) CONSTRAINT CHKEMPADD check ( EmployeeAddress not in( 'Newyork', 'London' ,'Paris' ) ),
+      salary number CONSTRAINT CHKEMPSAL check ( salary between 20000 and 30000),
+      companyaddress varchar2(20) default 'ASV Suntech Park'
+) 
+---CREATING CONSTRAINTS AT TABLE LEVEL -- CREATING MULTIPLE PRIMARY KEY -- COMPOSITE KEY
+
+
+
+
+-------FOREIGN KEY
+DROP TABLE EMPLOYEE;
+DROP TABLE PROJECT;
+
+create table project
+(
+    project_id number primary key,
+    project_name varchar(10) unique,
+    project_type varchar(10)
+)
+
+create table employee
+(  
+      EmployeeID number,
+      EmployeeName varchar2(10),
+      EmployeeAddress varchar2(20),
+      salary number,
+      project_id number,
+      companyaddress varchar2(20) default 'ASV Suntech Park',
+      CONSTRAINT pkid primary key (EmployeeID),
+      CONSTRAINT CHKEMPSAL check ( salary between 20000 and 30000),
+      CONSTRAINT CHKEMPADD check ( EmployeeAddress not in( 'Newyork', 'London' ,'Paris' ) ),
+      CONSTRAINT UNIEMPNAME UNIQUE (EmployeeName),
+      CONSTRAINT FKPID FOREIGN KEY (project_id) REFERENCES project(project_id)
+) 
+
+insert into project values (1009, 'Banking','Finance');
+insert into employee values(115,'Mohan','Delhi',25000, 1009, default);
+insert into employee values(116,'Yamini','Mumbai',25000, 1009, default);
+
+select * from employee;
+select * from project;
+
+
+-----------------------------------------------------------------------------------------------
+
+
+
+
+select * from employee;
+SELECT * from salary;
+---FK
+CREATE TABLE employee 
+(
+ EMPLOYEE_ID NUMBER CONSTRAINT EMP_ID primary key,
+ EMPLOYEE_NAME VARCHAR2(20) NOT NULL,
+ EMPLOYEE_ADDRESS VARCHAR2(20) CONSTRAINT EMP_ADD check ( EMPLOYEE_ADDRESS <>ALL ('Newyork','London','Paris')),
+ SALARY NUMBER CONSTRAINT EMP_SAL check ( salary between 20000 and 30000),
+ COMPANY_ADDRESS varchar2(20) default 'ASV Suntech Park'
+)
+
+
+create table SALARY
+(
+     EmployeeID number ,
+     Employee_PF number ,
+     Employee_HRA number ,
+     CONSTRAINT FK_PID FOREIGN KEY (EmployeeID ) REFERENCES EMPLOYEE(EMPLOYEE_ID),
+     CONSTRAINT EM_PF check ( Employee_PF > 0),
+     CONSTRAINT EM_HRA check ( Employee_HRA > 0)
+)
+insert into employee values(201,'Yamini','Delhi',25000, default);
+
+insert into salary values ( 200, 9800, 1200);
+
+
+
+
+select * from employee;
+select * from salary
+
+
+
+1) EVERY EMPLOYEE MUST WORK IN A PROJECT
+
+LINK 2ND employee table -- project_id (FK)
+
+
+	1ST project  (PARENT)
+		-- project_id
+
+FOREIGN KEY
+
+
+1ST EMPLOYEE (PARENT)
+
+
+2ND SALARY (FK)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
