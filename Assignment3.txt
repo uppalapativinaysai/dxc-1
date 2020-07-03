@@ -1,0 +1,25 @@
+Create a table called Employee with the following Columns  and following Constrains :-
+------------------------------------------------------------------------------------------------------------
+
+Assignment 2:
+
+EmployeeID should not be duplicate
+EmployeeName 
+EmployeeAddress  :- should not be Newyork, London and Paris
+Salary : should be between 20000 and 30000
+CompanyAddress : should be default as ASV Suntech Park
+
+
+
+Salary Table
+
+EmployeeID  :- should not be duplicate
+Employee PF  :- should not be negative
+Employee HRA :- should not be negative
+
+
+The Salary Table must match EmployeeID.
+
+
+via table level constraint
+----------------------------------15 Minutes
